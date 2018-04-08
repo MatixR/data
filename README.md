@@ -15,9 +15,11 @@
 ### Federal Reserve
 
 * Financial Accounts of the United States - Z.1 also known as the "Flow of Funds". [R file](frb/z1/z1.R). [Info](https://www.federalreserve.gov/releases/z1/).
+* Aggregate Reserves of Depository Institutions and the Monetary Base - H.3. [R file](frb/h3/h3.R). [Info](https://www.federalreserve.gov/releases/h3/).
+* Money Stock and Debt Measures - H.6. [R file](frb/h6/h6.R). [Info](https://www.federalreserve.gov/releases/h6/).
 * Assets and Liabilities of Commercial Banks in the United States - H.8. [R file](frb/h8/h8.R). [Info](https://www.federalreserve.gov/releases/h8/).
-* Selected Interest Rates (Daily) - H.15. [R file](frb/h15/h15.R). [Info](https://www.federalreserve.gov/releases/h15/).
 * Foreign Exchange Rates - H.10. [R file](frb/h10/h10.R). [Info](https://www.federalreserve.gov/releases/h10/).
+* Selected Interest Rates (Daily) - H.15. [R file](frb/h15/h15.R). [Info](https://www.federalreserve.gov/releases/h15/).
 * Dallas Fed. [R file](frb/dallas/dallas.R). [Info](https://www.dallasfed.org/institute/houseprice#tab2).
 
 ### Bureau of Economic Analysis
