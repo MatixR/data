@@ -11,8 +11,9 @@
 
 ## US Aggregate Datasets
 
-* Financial Accounts of the United States - Z.1 also known as the "Flow of Funds". [R file](frb-z1/frb-z1.R). [Info](https://www.federalreserve.gov/releases/z1/).
-* National Income and Product Accounts (NIPA) [R file](nipa/nipa.R). [Info](https://www.bea.gov/iTable/index_nipa.cfm).
+* Financial Accounts of the United States - Z.1 also known as the "Flow of Funds". [R file](frb/z1/z1.R). [Info](https://www.federalreserve.gov/releases/z1/).
+* National Income and Product Accounts (NIPA) [R file](bea/nipa/nipa.R). [Info](https://www.bea.gov/iTable/index_nipa.cfm).
+* Dallas Fed. [R file](frb/dallas/dallas.R). [Info](https://www.dallasfed.org/institute/houseprice#tab2).
 
 ## US Regional Datasets
 
@@ -24,4 +25,4 @@
 
 ## US Occupational Datasets
 
-* Occupational Employment Statistics (OES). [R file](oes/oes.R). [Info](https://www.bls.gov/oes/).
+* Occupational Employment Statistics (OES). [R file](bls/oes/oes.R). [Info](https://www.bls.gov/oes/).
