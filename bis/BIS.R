@@ -1,19 +1,25 @@
-pklist <- c("tidyverse", "data.table", "dplyr")
+pklist <- c("tidyverse", "data.table", "dplyr", "curl")
 source("https://raw.githubusercontent.com/fgeerolf/R/master/load-packages.R")
 
+# List: https://www.bis.org/statistics/full_data_sets.htm ------------
+
 url <- "https://www.bis.org/statistics/"
-# List: https://www.bis.org/statistics/full_data_sets.htm
 
 filename.zip <- c("full_bis_long_pp_csv.zip", 
                   "full_bis_selected_pp_csv.zip",
                   "full_webstats_credit_gap_dataflow_csv.zip",
                   "full_bis_total_credit_csv.zip",
-                  "full_bis_eer_csv.zip")
+                  "full_bis_eer_csv.zip",
+                  "full_bis_dsr_csv.zip",
+                  "full_webstats_long_cpi_dataflow_csv.zip")
+
 filename.csv <- c("WEBSTATS_LONG_PP_DATAFLOW_csv_col.csv", 
                   "WEBSTATS_SELECTED_PP_DATAFLOW_csv_col.csv",
                   "WEBSTATS_CREDIT_GAP_DATAFLOW_csv_col.csv",
                   "WEBSTATS_TOTAL_CREDIT_DATAFLOW_csv_col.csv",
-                  "BISWEB_EERDATAFLOW_csv_col.csv")
+                  "BISWEB_EERDATAFLOW_csv_col.csv",
+                  "WEBSTATS_DSR_DATAFLOW_csv_col.csv",
+                  "WEBSTATS_LONG_CPI_DATAFLOW_csv_col.csv")
 
 # long_pp -------------
 
@@ -32,8 +38,6 @@ long_pp <- read.csv(filename.csv[1]) %>%
   arrange(countryname, yearqtr)
 
 unlink(filename.csv[1])
-
-save(long_pp, file = "long_pp.RData")
 
 # selected_pp -------------
 
@@ -54,8 +58,6 @@ selected_pp <- read.csv(filename.csv[2]) %>%
 
 unlink(filename.csv[2])
 
-save(selected_pp, file = "selected_pp.RData")
-
 # credit_gap -------------
 
 curl_download(paste(url, filename.zip[3], sep = ""), filename.zip[3], quiet = FALSE)
@@ -75,9 +77,7 @@ credit_gap <- read.csv(filename.csv[3]) %>%
 
 unlink(filename.csv[3])
 
-save(credit_gap, file = "credit_gap.RData")
-
-# Total Credit -------------
+# total_credit -------------
 
 curl_download(paste(url, filename.zip[4], sep = ""), filename.zip[4], quiet = FALSE)
 unzip(filename.zip[4])
@@ -96,9 +96,7 @@ total_credit <- read.csv(filename.csv[4]) %>%
   
 unlink(filename.csv[4])
 
-save(total_credit, file = "total_credit.RData")
-
-# Long_PP -------------
+# eer -------------
 
 curl_download(paste(url, filename.zip[5], sep = ""), filename.zip[5], quiet = FALSE)
 unzip(filename.zip[5])
@@ -117,6 +115,23 @@ eer <- read.csv(filename.csv[5]) %>%
 
 unlink(filename.csv[5])
 
-save(eer, file = "eer.RData")
+# dsr -------------
+
+curl_download(paste(url, filename.zip[6], sep = ""), filename.zip[6], quiet = FALSE)
+unzip(filename.zip[6])
+unlink(filename.zip[6])
+
+dsr <- read.csv(filename.csv[6]) %>%
+  select(Reference.area = Borrowers..country, series = Borrowers, starts_with("X")) %>%
+  melt(id.vars = c("Reference.area", "series")) %>%
+  filter(!is.na(value)) %>%
+  mutate(countryname = paste(Reference.area),
+         variable = paste(variable),
+         yearqtr = as.numeric(substr(variable, 2, 5)) + (as.numeric(substr(variable, 8, 8))-1)/4) %>%
+  select(series, countryname, yearqtr, value) %>%
+  arrange(series, countryname, yearqtr)
+
+unlink(filename.csv[6])
+
 
 rm(url, filename.csv, filename.zip)
