@@ -1,0 +1,32 @@
+---
+title: "Household Credit: County Maps"
+output: github_document
+---
+
+```{r setup, echo = TRUE, include = FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+pklist <- c("tidyverse", "data.table", "maps", "curl")
+source("https://raw.githubusercontent.com/fgeerolf/R/master/load-packages.R")
+source("https://raw.githubusercontent.com/fgeerolf/datasets/master/frb-ny/household.credit.R")
+source("https://raw.githubusercontent.com/fgeerolf/R/master/map.countyfips.R")
+```
+
+```{r mortgage, echo = TRUE}
+pklist <- c("tidyverse", "data.table", "maps", "curl")
+source("https://raw.githubusercontent.com/fgeerolf/R/master/load-packages.R")
+source("https://raw.githubusercontent.com/fgeerolf/datasets/master/frb-ny/household.credit.R")
+source("https://raw.githubusercontent.com/fgeerolf/R/master/map.countyfips.R")
+
+household.credit.2006 <- household.credit %>%
+  filter(year == 2006) %>%
+  dcast(fips ~ variable, value.vars = "value")
+
+map.countyfips(household.credit.2006 %>% select(fips, value = mortgage))
+```
+```{r auto, echo = TRUE}
+map.countyfips(household.credit.2006 %>% select(fips, value = auto))
+```
+
+```{r creditcard, echo = TRUE}
+map.countyfips(household.credit.2006 %>% select(fips, value = creditcard))
+```

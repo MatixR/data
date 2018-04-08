@@ -1,0 +1,85 @@
+---
+title: "Political Database"
+output: github_document
+---
+
+```{r set-options, echo=FALSE, cache=FALSE}
+options(width = 800)
+```
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+pklist <- c("tidyverse", "data.table")
+source("https://raw.githubusercontent.com/fgeerolf/R/master/load-packages.R")
+source("https://raw.githubusercontent.com/fgeerolf/datasets/master/politics/world/DPI2015.R")
+load(url("https://github.com/fgeerolf/datasets/raw/master/oecd/EO.RData"))
+
+options(tibble.print_max = 3000)
+
+countrylist.EO <- EO %>%
+  select(countryname = Country) %>%
+  mutate(countryname = as.character(countryname)) %>%
+  unique %>%
+  unlist %>%
+  unname
+
+countrycode.EO <- EO %>%
+  select(countrycode = LOCATION) %>%
+  mutate(countrycode = as.character(countrycode)) %>%
+  unique %>%
+  unlist %>%
+  unname
+
+countrycode.DPI2015 <- DPI2015 %>%
+  select(countrycode = ifs) %>%
+  mutate(countrycode = as.character(countrycode)) %>%
+  unique %>%
+  unlist %>%
+  unname
+```
+
+# Countries in Economic Outlook (EO)
+
+```{r, include = TRUE, comment = NA}
+DPI2015 %>%
+  filter(ifs %in% countrycode.EO) %>%
+  arrange(countryname) %>%
+  select(countryname, year, execme, execrlc, gov1me, gov1rlc)
+```
+
+# Change in Governing party
+
+```{r, include = FALSE, comment = NA}
+government.changes <- DPI2015 %>%
+  filter(ifs %in% countrycode.EO) %>%
+  arrange(countryname) %>%
+  group_by(countryname) %>%
+  mutate(change = ifelse(gov1rlc != lag(gov1rlc), 1, 0)) %>%
+  filter(change == 1) %>%
+  select(countryname, countrycode = ifs, year, gov1me, gov1rlc)
+```
+
+
+<style>
+  .col2 {
+    columns: 2 400px;         /* number of columns and width in pixels*/
+    -webkit-columns: 2 400px; /* chrome, safari */
+    -moz-columns: 2 400px;    /* firefox */
+  }
+  .col3 {
+    columns: 3 200px;
+    -webkit-columns: 3 200px;
+    -moz-columns: 3 200px;
+  }
+</style>
+
+<div class = "col2">
+
+```{r, include = TRUE, comment = NA}
+government.changes %>% select(-countrycode)
+```
+
+</div>
+
+<br> <br> <br> 
+<br> <br> <br> 
