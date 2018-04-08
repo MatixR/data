@@ -1,4 +1,4 @@
-pklist <- c("quantmod", "tidyverse", "data.table", "plotly", "curl")
+pklist <- c("tidyverse", "data.table", "curl", "openxlsx")
 source("https://raw.githubusercontent.com/fgeerolf/R/master/load-packages.R")
 
 RRfolder <- "/Users/geerolf/Drive/work/datasets/macro-misc/reinhart-rogoff/data"
@@ -14,7 +14,8 @@ prefix <- "http://www.carmenreinhart.com/user_uploads/data/"
 suffix.xlsx <- "_data.xlsx"
 suffix.zip <- "_data.zip"
 
-files <- t(rbind(paste(c("236", "237", "238", "239", "240", "241"), rep(c("_data.xlsx", "_data.zip"), 3), sep = ""),
+files <- t(rbind(paste(c("236", "237", "238", "239", "240", "241"), 
+                       rep(c("_data.xlsx", "_data.zip"), 3), sep = ""),
                c("Anchor currency, annual, 1946-2016", 
                  "Anchor currency, monthly, 1946:1 - 2016:12", 
                  "Exchange rate regime classification, annual, 1946-2016",
@@ -26,26 +27,60 @@ for (i in 1:6){
   curl_download(paste(prefix, files[i,1], sep = ""), files[i,1], quiet = TRUE)
 }
 
-
-system("ssconvert -S 236_data.xlsx 236_data-%s.csv")
-system("ssconvert -S 238_data.xlsx 238_data-%s.csv")
-system("ssconvert -S 240_data.xlsx 240_data-%s.csv")
-unzip("237_data.zip")
-unzip("239_data.zip")
-unzip("241_data.zip")
-system("ssconvert -S Classification_Monthly_1940-2016.xlsx Classification_Monthly_1940-2016-%s.csv")
-system("ssconvert -S Anchor_monthly_1946-2016.xlsx Classification_Monthly_1940-2016-%s.csv")
-
-
 # Correspondance Coutries ----------
 
-countrylist.imf <- read.csv('../correspondance-countries.csv', stringsAsFactors = FALSE, encoding = "Western") %>%
+countrylist.imf <- read.csv("https://raw.githubusercontent.com/fgeerolf/data/master/crosswalks/correspondance-countries.csv", stringsAsFactors = FALSE, encoding = "Western") %>%
   mutate_all(funs(as.character(paste(.)))) %>%
   select(countryname.imf) %>%
   unlist %>%
   unname
 
 countrylist.imf[44] <- "Côte d'Ivoire"
+
+# New ones ---------
+
+data <- read.xlsx("236_data.xlsx", sheet = 2, startRow = 7)
+?read.xlsx
+
+unzip("237_data.zip")
+unzip("239_data.zip")
+unzip("241_data.zip")
+
+# Annual.Fine.2016 ----------
+
+Annual.Fine.2016 <- read.xlsx("238_data.xlsx", sheet = 3, startRow = 6)
+names(Annual.Fine.2016)[-1] <- countrylist.imf
+
+Annual.Fine.2016 <- Annual.Fine.2016 %>%
+  rename(year = X1) %>%
+  mutate(year = as.numeric(year)) %>%
+  melt(id.vars = "year") %>%
+  mutate(value = ifelse(value == "MISSING", NA, value)) %>%
+  mutate(value = as.numeric(value),
+         variable = as.character(variable),
+         variable = gsub('\\.'," ",variable),
+         variable = stri_trans_totitle(paste(substring(variable,first=1,last=1),
+                                             tolower(substring(variable,first=2,last=100000L)),sep=""))) %>%
+  select(year, countryname = variable, ERregime = value) %>%
+  filter(!is.na(ERregime))
+
+# Annual.Coarse.2016 ----------
+
+Annual.Coarse.2016 <- read.xlsx("238_data.xlsx", sheet = 4, startRow = 6)
+names(Annual.Coarse.2016)[-1] <- countrylist.imf
+
+Annual.Coarse.2016 <- Annual.Coarse.2016 %>%
+  rename(year = X1) %>%
+  mutate(year = as.numeric(year)) %>%
+  melt(id.vars = "year") %>%
+  mutate(value = ifelse(value == "MISSING", NA, value)) %>%
+  mutate(value = as.numeric(value),
+         variable = as.character(variable),
+         variable = gsub('\\.'," ",variable),
+         variable = stri_trans_totitle(paste(substring(variable,first=1,last=1),
+                                             tolower(substring(variable,first=2,last=100000L)),sep=""))) %>%
+  select(year, countryname = variable, ERregime = value) %>%
+  filter(!is.na(ERregime))
 
 # Annual.Coarse.2016 --------
 

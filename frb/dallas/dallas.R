@@ -1,4 +1,4 @@
-pklist <- c("data.table", "tidyverse", "xlsx")
+pklist <- c("data.table", "tidyverse", "openxlsx")
 # https://www.dallasfed.org/-/media/Documents/institute/houseprice/hp1604.xlsx
 
 source("https://raw.githubusercontent.com/fgeerolf/R/master/load-packages.R")
