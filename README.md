@@ -8,10 +8,14 @@
 * Maddison Data. [R file](maddison/maddison.R). [Info](https://www.rug.nl/ggdc/historicaldevelopment/maddison/releases/maddison-project-database-2018).
 * Capital Openness. [R file](kaopen/kaopen.R). [Info](http://web.pdx.edu/~ito).
 * Bank of International Settlements (BIS). [R file](bis/bis.R). [Info](https://www.bis.org/statistics/full_data_sets.htm).
+* Ilzetzki, Reinhart and Rogoff Classification. [R file](bis/bis.R). [Info](http://www.carmenreinhart.com/data/browse-by-topic/topics/11/).
 
 ## US Aggregate Datasets
 
 * Financial Accounts of the United States - Z.1 also known as the "Flow of Funds". [R file](frb/z1/z1.R). [Info](https://www.federalreserve.gov/releases/z1/).
+* Assets and Liabilities of Commercial Banks in the United States - H.8. [R file](frb/h8/h8.R). [Info](https://www.federalreserve.gov/releases/h8/).
+* Selected Interest Rates (Daily) - H.15. [R file](frb/h15/h15.R). [Info](https://www.federalreserve.gov/releases/h15/).
+* Foreign Exchange Rates - H.10. [R file](frb/h10/h10.R). [Info](https://www.federalreserve.gov/releases/h10/).
 * National Income and Product Accounts (NIPA) [R file](bea/nipa/nipa.R). [Info](https://www.bea.gov/iTable/index_nipa.cfm).
 * Dallas Fed. [R file](frb/dallas/dallas.R). [Info](https://www.dallasfed.org/institute/houseprice#tab2).
 
