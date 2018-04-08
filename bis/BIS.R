@@ -1,88 +1,122 @@
-rm(list=ls()); ipak <- function(pkg){new.pkg <- pkg[!(pkg %in% installed.packages()[, "Package"])]; if (length(new.pkg)) install.packages(new.pkg, dependencies = TRUE); sapply(pkg, require, character.only = TRUE)}
-pklist <- c("foreign","readstata13","stats4","plotrix","VGAM","fitdistrplus","ggplot2","GB2","xlsx",
-            "data.table","dplyr","ggplot2","zoo","xts","dygraphs","gplots","foreign","car","plm","tseries","stats","dplyr","plyr",
-            "stringr","pracma","expm","vars","tictoc","foreign","dplyr","tidyverse","tidyr","broom","mFilter","stats","DataCombine");  ipak(pklist); rm(pklist,ipak)
+pklist <- c("tidyverse", "data.table", "dplyr")
+source("https://raw.githubusercontent.com/fgeerolf/R/master/load-packages.R")
 
-setwd("/Users/geerolf/Drive/work/datasets/bis/data/")
+url <- "https://www.bis.org/statistics/"
+# List: https://www.bis.org/statistics/full_data_sets.htm
 
-# Long_PP -------------
+filename.zip <- c("full_bis_long_pp_csv.zip", 
+                  "full_bis_selected_pp_csv.zip",
+                  "full_webstats_credit_gap_dataflow_csv.zip",
+                  "full_bis_total_credit_csv.zip",
+                  "full_bis_eer_csv.zip")
+filename.csv <- c("WEBSTATS_LONG_PP_DATAFLOW_csv_col.csv", 
+                  "WEBSTATS_SELECTED_PP_DATAFLOW_csv_col.csv",
+                  "WEBSTATS_CREDIT_GAP_DATAFLOW_csv_col.csv",
+                  "WEBSTATS_TOTAL_CREDIT_DATAFLOW_csv_col.csv",
+                  "BISWEB_EERDATAFLOW_csv_col.csv")
 
-unzip('full_bis_long_pp_csv.zip')
-long_pp <- read.csv("full_WEBSTATS_LONG_PP_DATAFLOW_csv.csv", skip = 6) 
-file.remove("full_WEBSTATS_LONG_PP_DATAFLOW_csv.csv") 
-long_pp <- melt(long_pp,id=names(long_pp)[1:3])
+# long_pp -------------
 
-long_pp <- long_pp %>% filter(!is.na(value)) %>% 
-  mutate(countryname=substr(Reference.area, start = 4, stop = 100000), 
-         countrycode=substr(Reference.area, start = 1, stop = 2),
-         yearqtr=paste(substr(variable,2,5)," Q",substr(variable,8,8),sep="")) %>%
-  select(countryname,countrycode,yearqtr,value) %>% 
-  arrange(countryname,yearqtr)
+curl_download(paste(url, filename.zip[1], sep = ""), filename.zip[1], quiet = FALSE)
+unzip(filename.zip[1])
+unlink(filename.zip[1])
 
-# Selected PP -------------
+long_pp <- read.csv(filename.csv[1]) %>%
+  select(Reference.area, starts_with("X")) %>%
+  melt(id.vars = c("Reference.area")) %>%
+  filter(!is.na(value)) %>%
+  mutate(countryname = paste(Reference.area),
+         variable = paste(variable),
+         yearqtr = as.numeric(substr(variable, 2, 5)) + (as.numeric(substr(variable, 8, 8))-1)/4) %>%
+  select(countryname, yearqtr, value) %>%
+  arrange(countryname, yearqtr)
 
-unzip('full_bis_selected_pp_csv.zip')
-selected_pp <- read.csv("full_WEBSTATS_SELECTED_PP_DATAFLOW_csv.csv", skip = 5)
-file.remove("full_WEBSTATS_SELECTED_PP_DATAFLOW_csv.csv") 
-selected_pp <- melt(selected_pp,id=names(selected_pp)[1:5])
+unlink(filename.csv[1])
 
-selected_pp_nominal <- selected_pp %>% filter(!is.na(value) & Value=="N:Nominal" & Unit.of.measure=="628:Index, 2010 = 100") %>% 
-  mutate(countryname=substr(Reference.area, start = 4, stop = 100000), 
-         countrycode=substr(Reference.area, start = 1, stop = 2),
-         yearqtr=paste(substr(variable,2,5)," Q",substr(variable,8,8),sep="")) %>%
-  select(countryname,countrycode,yearqtr,value) %>% 
-  arrange(countryname,yearqtr)
+save(long_pp, file = "long_pp.RData")
 
-selected_pp_real <- selected_pp %>% filter(!is.na(value) & Value=="R:Real" & Unit.of.measure=="628:Index, 2010 = 100") %>% 
-  mutate(countryname=substr(Reference.area, start = 4, stop = 100000), 
-         countrycode=substr(Reference.area, start = 1, stop = 2),
-         yearqtr=paste(substr(variable,2,5)," Q",substr(variable,8,8),sep="")) %>%
-  select(countryname,countrycode,yearqtr,value) %>% 
-  arrange(countryname,yearqtr)
+# selected_pp -------------
 
-# Credit Gap -------------
+curl_download(paste(url, filename.zip[2], sep = ""), filename.zip[2], quiet = FALSE)
+unzip(filename.zip[2])
+unlink(filename.zip[2])
 
-unzip('full_webstats_credit_gap_dataflow_csv.zip')
-credit_gap <- read.csv("full_WEBSTATS_CREDIT_GAP_DATAFLOW_csv.csv", skip = 15)
-file.remove("full_WEBSTATS_CREDIT_GAP_DATAFLOW_csv.csv") 
-credit_gap <- melt(credit_gap,id=names(credit_gap)[1])
+selected_pp <- read.csv(filename.csv[2]) %>%
+  filter(UNIT_MEASURE == 628) %>%
+  select(Reference.area, measure = Value, starts_with("X")) %>%
+  melt(id.vars = c("Reference.area", "measure")) %>%
+  filter(!is.na(value)) %>%
+  mutate(countryname = paste(Reference.area),
+         variable = paste(variable),
+         yearqtr = as.numeric(substr(variable, 2, 5)) + (as.numeric(substr(variable, 8, 8))-1)/4) %>%
+  select(measure, countryname, yearqtr, value) %>%
+  arrange(measure, countryname, yearqtr)
+
+unlink(filename.csv[2])
+
+save(selected_pp, file = "selected_pp.RData")
+
+# credit_gap -------------
+
+curl_download(paste(url, filename.zip[3], sep = ""), filename.zip[3], quiet = FALSE)
+unzip(filename.zip[3])
+unlink(filename.zip[3])
+
+credit_gap <- read.csv(filename.csv[3]) %>%
+  filter(CG_DTYPE == "A") %>%
+  select(Reference.area = Borrowers..country, starts_with("X")) %>%
+  melt(id.vars = c("Reference.area")) %>%
+  filter(!is.na(value)) %>%
+  mutate(countryname = paste(Reference.area),
+         variable = paste(variable),
+         yearqtr = as.numeric(substr(variable, 2, 5)) + (as.numeric(substr(variable, 8, 8))-1)/4) %>%
+  select(countryname, yearqtr, value) %>%
+  arrange(countryname, yearqtr)
+
+unlink(filename.csv[3])
+
+save(credit_gap, file = "credit_gap.RData")
 
 # Total Credit -------------
 
-setwd('/Users/geerolf/Drive/work/datasets/bis/data/')
-unzip('full_bis_total_credit_csv.zip')
-total_credit <- read.csv("full_WEBSTATS_TOTAL_CREDIT_DATAFLOW_csv.csv", skip = 5)
-file.remove("full_WEBSTATS_TOTAL_CREDIT_DATAFLOW_csv.csv") 
-total_credit <- melt(total_credit,id=names(total_credit)[1:8])
+curl_download(paste(url, filename.zip[4], sep = ""), filename.zip[4], quiet = FALSE)
+unzip(filename.zip[4])
+unlink(filename.zip[4])
 
-total_credit <- total_credit %>% 
-  filter(!is.na(value)) %>% 
-  mutate(countryname=substr(Borrowers..country, start = 4, stop = 100000), 
-         yearqtr=paste(substr(variable,2,5)," Q",substr(variable,8,8),sep=""),
-         series=substr(Time.Period, 6, 100000)) %>%
-  select(countryname,yearqtr,series,value) %>% 
-  arrange(countryname,yearqtr)
+total_credit <- read.csv(filename.csv[4]) %>%
+  select(Reference.area = Borrowers..country, Time.Period, starts_with("X")) %>%
+  mutate(Time.Period = substr(Time.Period, 6, 100000)) %>%
+  melt(id.vars = c("Reference.area", "Time.Period")) %>%
+  filter(!is.na(value)) %>%
+  mutate(countryname = paste(Reference.area),
+         variable = paste(variable),
+         yearqtr = as.numeric(substr(variable, 2, 5)) + (as.numeric(substr(variable, 8, 8))-1)/4) %>%
+  select(series = Time.Period, countryname, yearqtr, value) %>%
+  arrange(series, countryname, yearqtr)
   
+unlink(filename.csv[4])
+
+save(total_credit, file = "total_credit.RData")
 
 # Long_PP -------------
 
-unzip('full_bis_eer_csv.zip')
-eer <- read.csv("full_BISWEB_EERDATAFLOW_csv.csv", skip = 4)
-file.remove("full_BISWEB_EERDATAFLOW_csv.csv") 
-eer <- melt(eer,id=names(eer)[1:5])
+curl_download(paste(url, filename.zip[5], sep = ""), filename.zip[5], quiet = FALSE)
+unzip(filename.zip[5])
+unlink(filename.zip[5])
 
-# Arrange Datasets -------------
+eer <- read.csv(filename.csv[5]) %>%
+  select(Reference.area, Time.Period, starts_with("X")) %>%
+  mutate(Time.Period = substr(Time.Period, 1, 5)) %>%
+  melt(id.vars = c("Reference.area", "Time.Period")) %>%
+  filter(!is.na(value)) %>%
+  mutate(countryname = paste(Reference.area),
+         variable = paste(variable),
+         yearqtr = as.numeric(substr(variable, 2, 5)) + (as.numeric(substr(variable, 8, 8))-1)/4) %>%
+  select(series = Time.Period, countryname, yearqtr, value) %>%
+  arrange(series, countryname, yearqtr)
 
+unlink(filename.csv[5])
 
-credit_gap <- credit_gap %>% filter(!is.na(value))
+save(eer, file = "eer.RData")
 
-eer <- eer %>% filter(!is.na(value)) %>% 
-  mutate(yearmonth=paste(substr(variable,2,5)," M",substr(variable,7,8),sep="")) %>%
-  select(Type,Basket,Reference.area,seriesname=Time.Period,yearmonth,value) %>% 
-  arrange(Type,Basket,Reference.area,yearmonth)
-
-rm(selected_pp)
-
-
-
-
+rm(url, filename.csv, filename.zip)
