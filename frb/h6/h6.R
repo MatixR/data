@@ -10,4 +10,5 @@ h6 <- readSDMX("H6_data.xml", isURL = FALSE) %>%
   as.data.table
 
 unlink(filename)
-unlink(c("H6_data.xml", "H6_H6.xsd", "H6_struct.xml", "frb_common.xsd"))
+unlink(c("H6_data.xml", "H6_H6.xsd", "H6_struct.xml", "frb_common.xsd", 
+         "H6_H6_M1.xsd", "H6_H6_M2.xsd", "H6_H6_MEMO.xsd", "H6_H6M3_DISCONTINUED.xsd"))
