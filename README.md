@@ -10,10 +10,12 @@
 
 ### Other
 
-* Penn World Tables (PWT). [R file](pwt/pwt.R). [Info](https://www.rug.nl/ggdc/productivity/pwt/).
+* Penn World Tables (PWT), also known as Groningen Growth and Development Center Database. [R file](pwt/pwt.R). [Info](https://www.rug.nl/ggdc/productivity/pwt/).
 * Ilzetzki, Reinhart and Rogoff Classification. [R file](bis/bis.R). [Info](http://www.carmenreinhart.com/data/browse-by-topic/topics/11/).
 * Capital Openness. [R file](kaopen/kaopen.R). [Info](http://web.pdx.edu/~ito).
 * Maddison Data. [R file](maddison/maddison.R). [Info](https://www.rug.nl/ggdc/historicaldevelopment/maddison/releases/maddison-project-database-2018).
+* Luxembourg Income Study (LIS) Database. [Info](http://www.lisdatacenter.org/our-data/lis-database/).
+* Luxembourg Wealth Study (LWS) Database. [Info](http://www.lisdatacenter.org/our-data/lws-database/).
 
 ### Crosswalks
 
